@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pi Clicker</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- SDK Pi Network -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
@@ -14,9 +15,16 @@
   <button id="click-btn">Click!</button>
   <button id="pay-btn">Acheter un bonus (0.01 π)</button>
 
+  <!-- Initialisation du SDK avec sandbox activé -->
   <script>
-    Pi.init({ version: "2.0" });
+    const isSandbox = true; // Passe à false pour production
+    Pi.init({
+      version: "2.0",
+      sandbox: isSandbox
+    });
   </script>
+
+  <!-- Script principal du jeu -->
   <script src="main.js"></script>
 </body>
 </html>

@@ -1,9 +1,3 @@
-// Ajouter une variable pour activer le mode sandbox
-const isSandbox = true; // Mettre à 'true' pour activer le mode sandbox
-
-// Si tu utilises Pi SDK, tu peux ajouter un flag pour l'API en mode sandbox
-const Pi = isSandbox ? new PiClient({ baseUrl: "https://sandbox-api.minepi.com" }) : new PiClient();
-
 // Variables pour le jeu
 let score = 0;
 const scoreEl = document.getElementById('score');
