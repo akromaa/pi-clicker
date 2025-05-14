@@ -1,0 +1,22 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pi Clicker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+<body>
+  <h1>Pi Clicker</h1>
+  <p>Score: <span id="score">0</span></p>
+  <button id="click-btn">Click!</button>
+  <button id="pay-btn">Acheter un bonus (0.01 π)</button>
+
+  <script>
+    Pi.init({ version: "2.0" });
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
