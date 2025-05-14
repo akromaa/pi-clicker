@@ -1,3 +1,6 @@
+// Logs pour vérifier que le script est chargé
+console.log("[INIT] Chargement du script main.js...");
+
 // Variables pour le jeu
 let score = 0;
 const scoreEl = document.getElementById('score');
@@ -8,38 +11,43 @@ const payBtn = document.getElementById('pay-btn');
 clickBtn.addEventListener('click', () => {
   score++;
   scoreEl.textContent = score;
+  console.log(`[CLICK] Score actuel : ${score}`);
 });
 
 // Authentifier l’utilisateur
 const scopes = ['payments'];
+console.log("[AUTH] Tentative d'authentification...");
+
 Pi.authenticate(scopes, (payment) => {
-  console.log("Paiement incomplet détecté :", payment);
+  console.log("[AUTH] Paiement incomplet détecté :", payment);
 }).then(auth => {
-  console.log("Utilisateur authentifié :", auth);
+  console.log("[AUTH] Utilisateur authentifié avec succès :", auth);
 }).catch(err => {
-  console.error("Erreur d’authentification :", err);
+  console.error("[AUTH] Erreur d’authentification :", err);
 });
 
 // Paiement
 payBtn.addEventListener('click', () => {
+  console.log("[PAYMENT] Démarrage du processus de paiement...");
+
   Pi.createPayment({
     amount: 0.01,
     memo: "Achat bonus Pi Clicker",
     metadata: { bonus: true }
   }, {
     onReadyForServerApproval: (paymentId) => {
-      console.log("Prêt pour approbation serveur :", paymentId);
+      console.log("[PAYMENT] Prêt pour approbation serveur. ID :", paymentId);
     },
     onReadyForServerCompletion: (paymentId, txid) => {
-      console.log("Paiement terminé :", txid);
+      console.log("[PAYMENT] Paiement terminé avec succès. Transaction ID :", txid);
       score += 100; // Exemple : donner 100 points bonus
       scoreEl.textContent = score;
     },
     onCancel: (paymentId) => {
-      console.log("Paiement annulé :", paymentId);
+      console.warn("[PAYMENT] Paiement annulé. ID :", paymentId);
     },
     onError: (err, payment) => {
-      console.error("Erreur de paiement :", err);
+      console.error("[PAYMENT] Erreur lors du paiement :", err, payment);
     }
   });
 });
