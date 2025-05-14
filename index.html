@@ -1,53 +1,30 @@
-// Logs pour vérifier que le script est chargé
-console.log("[INIT] Chargement du script main.js...");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pi Clicker</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- SDK Pi Network -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+<body>
+  <h1>Pi Clicker</h1>
+  <p>Score: <span id="score">0</span></p>
+  <button id="click-btn">Click!</button>
+  <button id="pay-btn">Acheter un bonus (0.01 π)</button>
 
-// Variables pour le jeu
-let score = 0;
-const scoreEl = document.getElementById('score');
-const clickBtn = document.getElementById('click-btn');
-const payBtn = document.getElementById('pay-btn');
+  <!-- Initialisation du SDK avec sandbox activé -->
+  <script>
+    const isSandbox = true; // Passe à false pour production
+    Pi.init({
+      version: "2.0",
+      sandbox: isSandbox
+    });
+    console.log(`[INIT] Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "non activé"})`);
+  </script>
 
-// Incrémenter le score au clic
-clickBtn.addEventListener('click', () => {
-  score++;
-  scoreEl.textContent = score;
-  console.log(`[CLICK] Score actuel : ${score}`);
-});
-
-// Authentifier l’utilisateur
-const scopes = ['payments'];
-console.log("[AUTH] Tentative d'authentification...");
-
-Pi.authenticate(scopes)
-  .then(auth => {
-    console.log("[AUTH] Utilisateur authentifié avec succès :", auth);
-  })
-  .catch(err => {
-    console.error("[AUTH] Erreur d’authentification :", err);
-  });
-
-// Paiement
-payBtn.addEventListener('click', () => {
-  console.log("[PAYMENT] Démarrage du processus de paiement...");
-
-  Pi.createPayment({
-    amount: 0.01,
-    memo: "Achat bonus Pi Clicker",
-    metadata: { bonus: true }
-  }, {
-    onReadyForServerApproval: (paymentId) => {
-      console.log("[PAYMENT] Prêt pour approbation serveur. ID :", paymentId);
-    },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      console.log("[PAYMENT] Paiement terminé avec succès. Transaction ID :", txid);
-      score += 100;
-      scoreEl.textContent = score;
-    },
-    onCancel: (paymentId) => {
-      console.warn("[PAYMENT] Paiement annulé. ID :", paymentId);
-    },
-    onError: (err, payment) => {
-      console.error("[PAYMENT] Erreur lors du paiement :", err, payment);
-    }
-  });
-});
+  <!-- Script principal du jeu -->
+  <script src="main.js"></script>
+</body>
+</html>
