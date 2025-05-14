@@ -18,13 +18,13 @@ clickBtn.addEventListener('click', () => {
 const scopes = ['payments'];
 console.log("[AUTH] Tentative d'authentification...");
 
-Pi.authenticate(scopes, (payment) => {
-  console.log("[AUTH] Paiement incomplet détecté :", payment);
-}).then(auth => {
-  console.log("[AUTH] Utilisateur authentifié avec succès :", auth);
-}).catch(err => {
-  console.error("[AUTH] Erreur d’authentification :", err);
-});
+Pi.authenticate(scopes)
+  .then(auth => {
+    console.log("[AUTH] Utilisateur authentifié avec succès :", auth);
+  })
+  .catch(err => {
+    console.error("[AUTH] Erreur d’authentification :", err);
+  });
 
 // Paiement
 payBtn.addEventListener('click', () => {
@@ -40,7 +40,7 @@ payBtn.addEventListener('click', () => {
     },
     onReadyForServerCompletion: (paymentId, txid) => {
       console.log("[PAYMENT] Paiement terminé avec succès. Transaction ID :", txid);
-      score += 100; // Exemple : donner 100 points bonus
+      score += 100;
       scoreEl.textContent = score;
     },
     onCancel: (paymentId) => {
