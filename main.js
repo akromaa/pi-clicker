@@ -1,69 +1,72 @@
-console.log("[INIT] Chargement main.js");
+// === LOG HTML DANS LA PAGE ===
+function log(msg) {
+  const logEl = document.getElementById('log');
+  if (logEl) {
+    const line = document.createElement('div');
+    line.textContent = `[LOG] ${msg}`;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  console.log(msg);
+}
 
-const isSandbox = true; // passe à false en prod
+log("Chargement du script main.js...");
 
+const isSandbox = true;
 let score = 0;
+
 const scoreEl = document.getElementById('score');
 const clickBtn = document.getElementById('click-btn');
 const payBtn = document.getElementById('pay-btn');
 const connectBtn = document.getElementById('connect-btn');
-const messageEl = document.getElementById('message');
 
+// === Initialisation du SDK ===
 window.addEventListener('load', () => {
+  if (typeof Pi === "undefined") {
+    log("Erreur : SDK Pi non chargé.");
+    return;
+  }
+
   Pi.init({ version: "2.0", sandbox: isSandbox });
-  console.log(`[INIT] Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
+  log(`Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
+
+  setupUI();
 });
 
-connectBtn.addEventListener('click', () => {
-  console.log("[AUTH] Tentative d'authentification...");
-  Pi.authenticate(['payments'])
-    .then(auth => {
-      console.log("[AUTH] Authentification réussie", auth);
-      messageEl.textContent = `Bienvenue ${auth.user.username} !`;
-      connectBtn.disabled = true;
-      clickBtn.disabled = false;
-      payBtn.disabled = false;
-    })
-    .catch(err => {
-      console.error("[AUTH] Échec de l'authentification", err);
-      messageEl.textContent = "Erreur d'authentification. Veuillez utiliser le Pi Browser.";
-    });
-});
-
-clickBtn.addEventListener('click', () => {
-  score++;
-  scoreEl.textContent = score;
-  console.log(`[CLICK] Score actuel : ${score}`);
-});
-
-payBtn.addEventListener('click', () => {
-  console.log("[PAYMENT] Paiement en cours...");
-  payBtn.disabled = true;
-
-  Pi.createPayment({
-    amount: 0.01,
-    memo: "Achat bonus Pi Clicker",
-    metadata: { bonus: true }
-  }, {
-    onReadyForServerApproval: (paymentId) => {
-      console.log("[PAYMENT] Prêt pour approbation serveur. ID :", paymentId);
-    },
-    onReadyForServerCompletion: (paymentId, txid) => {
-      console.log("[PAYMENT] Paiement complété. TxID :", txid);
-      score += 100;
-      scoreEl.textContent = score;
-      messageEl.textContent = "Paiement validé et bonus ajouté !";
-      payBtn.disabled = false;
-    },
-    onCancel: (paymentId) => {
-      console.warn("[PAYMENT] Paiement annulé :", paymentId);
-      messageEl.textContent = "Paiement annulé.";
-      payBtn.disabled = false;
-    },
-    onError: (err, payment) => {
-      console.error("[PAYMENT] Erreur :", err, payment);
-      messageEl.textContent = "Erreur lors du paiement.";
-      payBtn.disabled = false;
-    }
+// === Fonction de configuration de l'UI ===
+function setupUI() {
+  clickBtn.addEventListener('click', () => {
+    score++;
+    scoreEl.textContent = score;
+    log(`Clique ! Nouveau score : ${score}`);
   });
-});
+
+  connectBtn.addEventListener('click', () => {
+    log("Connexion en cours...");
+    Pi.authenticate(['payments'])
+      .then(auth => {
+        log(`Authentification réussie pour ${auth.user?.username || "utilisateur inconnu"}`);
+        clickBtn.disabled = false;
+        payBtn.disabled = false;
+        connectBtn.disabled = true;
+      })
+      .catch(err => {
+        log("Erreur d'authentification : " + err.message);
+      });
+  });
+
+  payBtn.addEventListener('click', () => {
+    log("Début du paiement...");
+
+    Pi.createPayment({
+      amount: 0.01,
+      memo: "Achat bonus Pi Clicker",
+      metadata: { bonus: true }
+    }, {
+      onReadyForServerApproval: (paymentId) => {
+        log("Prêt pour approbation serveur. Payment ID : " + paymentId);
+      },
+      onReadyForServerCompletion: (paymentId, txid) => {
+        log(`Paiement approuvé ! Transaction ID : ${txid}`);
+        score += 100;
+        scoreEl.textContent = score;
