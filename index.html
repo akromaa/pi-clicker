@@ -1,2 +1,30 @@
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script src="main.js"></script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pi Clicker</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
+<body>
+  <h1>Pi Clicker</h1>
+  <p>Score: <span id="score">0</span></p>
+  <button id="click-btn">Click!</button>
+  <button id="pay-btn" disabled>Acheter un bonus (0.01 π)</button>
+
+  <script>
+    // Init SDK Pi dès que la page est chargée
+    const isSandbox = true; // mettre false en prod
+    window.addEventListener('load', () => {
+      Pi.init({
+        version: "2.0",
+        sandbox: isSandbox
+      });
+      console.log(`[INIT] Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
+    });
+  </script>
+
+  <script src="main.js"></script>
+</body>
+</html>

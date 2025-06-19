@@ -6,6 +6,31 @@ const scoreEl = document.getElementById('score');
 const clickBtn = document.getElementById('click-btn');
 const payBtn = document.getElementById('pay-btn');
 
+// Mock Pi SDK pour dev local
+if (!window.Pi) {
+  console.warn("[MOCK] Pi SDK non détecté, activation du mock pour développement local.");
+
+  window.Pi = {
+    init: ({ version, sandbox }) => {
+      console.log(`[MOCK] Pi.init appelé - version: ${version}, sandbox: ${sandbox}`);
+    },
+    authenticate: (scopes) => {
+      console.log("[MOCK] Pi.authenticate appelé avec scopes:", scopes);
+      return Promise.resolve({ userId: "mockUser", scopes });
+    },
+    createPayment: (params, callbacks) => {
+      console.log("[MOCK] Pi.createPayment appelé avec params:", params);
+      setTimeout(() => {
+        callbacks.onReadyForServerApproval("mockPaymentId");
+        setTimeout(() => {
+          callbacks.onReadyForServerCompletion("mockPaymentId", "mockTxId123");
+        }, 1000);
+      }, 500);
+      return Promise.resolve();
+    }
+  };
+}
+
 function setupApp() {
   // Incrémenter score au clic
   clickBtn.addEventListener('click', () => {
