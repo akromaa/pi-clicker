@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pi Clicker - PiNet compatible</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <meta charset="UTF-8">
+  <title>Pi Clicker</title>
 </head>
 <body>
   <h1>Pi Clicker</h1>
-  <p>Score : <span id="score">0</span></p>
-  <button id="click-btn">Clique ici !</button>
-  <button id="pay-btn">Acheter un bonus (0.01 π)</button>
+  <p>Score: <span id="score">0</span></p>
+  <button id="connect-btn">Se connecter</button>
+  <button id="click-btn" disabled>Clicker</button>
+  <button id="pay-btn" disabled>Acheter un bonus</button>
+  <p id="message"></p>
 
-  <p id="message" style="color: red; font-weight: bold;"></p>
-
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

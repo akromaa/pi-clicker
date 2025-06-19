@@ -1,67 +1,69 @@
-console.log("[INIT] Chargement du script main.js...");
+console.log("[INIT] Chargement main.js");
 
+const isSandbox = true; // passe à false en prod
+
+let score = 0;
 const scoreEl = document.getElementById('score');
 const clickBtn = document.getElementById('click-btn');
 const payBtn = document.getElementById('pay-btn');
+const connectBtn = document.getElementById('connect-btn');
 const messageEl = document.getElementById('message');
 
-let score = 0;
-const isSandbox = true; // false en production
-
-// Initialisation SDK Pi
-Pi.init({
-  version: "2.0",
-  sandbox: isSandbox
+window.addEventListener('load', () => {
+  Pi.init({ version: "2.0", sandbox: isSandbox });
+  console.log(`[INIT] Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
 });
-console.log(`[INIT] Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
 
-// Incrémenter score au clic (disponible pour tous, sans auth)
+connectBtn.addEventListener('click', () => {
+  console.log("[AUTH] Tentative d'authentification...");
+  Pi.authenticate(['payments'])
+    .then(auth => {
+      console.log("[AUTH] Authentification réussie", auth);
+      messageEl.textContent = `Bienvenue ${auth.user.username} !`;
+      connectBtn.disabled = true;
+      clickBtn.disabled = false;
+      payBtn.disabled = false;
+    })
+    .catch(err => {
+      console.error("[AUTH] Échec de l'authentification", err);
+      messageEl.textContent = "Erreur d'authentification. Veuillez utiliser le Pi Browser.";
+    });
+});
+
 clickBtn.addEventListener('click', () => {
   score++;
   scoreEl.textContent = score;
   console.log(`[CLICK] Score actuel : ${score}`);
 });
 
-// Paiement uniquement quand utilisateur clique sur payBtn
 payBtn.addEventListener('click', () => {
-  messageEl.textContent = "";  // reset message
-  payBtn.disabled = true;      // éviter spam clics
+  console.log("[PAYMENT] Paiement en cours...");
+  payBtn.disabled = true;
 
-  // Authentification Pi au moment du paiement
-  Pi.authenticate(['payments'])
-    .then(auth => {
-      console.log("[AUTH] Authentifié avec succès :", auth);
-
-      // Création paiement
-      return Pi.createPayment({
-        amount: 0.01,
-        memo: "Achat bonus Pi Clicker",
-        metadata: { bonus: true }
-      }, {
-        onReadyForServerApproval: (paymentId) => {
-          console.log("[PAYMENT] Prêt pour approbation serveur. ID :", paymentId);
-        },
-        onReadyForServerCompletion: (paymentId, txid) => {
-          console.log("[PAYMENT] Paiement réussi. TxID :", txid);
-          score += 100;
-          scoreEl.textContent = score;
-          payBtn.disabled = false;
-        },
-        onCancel: (paymentId) => {
-          console.warn("[PAYMENT] Paiement annulé. ID :", paymentId);
-          payBtn.disabled = false;
-        },
-        onError: (err, payment) => {
-          console.error("[PAYMENT] Erreur :", err, payment);
-          messageEl.textContent = "Erreur lors du paiement.";
-          payBtn.disabled = false;
-        }
-      });
-
-    })
-    .catch(err => {
-      console.error("[AUTH] Erreur auth ou hors Pi Browser :", err);
-      messageEl.textContent = "Vous devez ouvrir cette app dans le Pi Browser pour effectuer un paiement.";
+  Pi.createPayment({
+    amount: 0.01,
+    memo: "Achat bonus Pi Clicker",
+    metadata: { bonus: true }
+  }, {
+    onReadyForServerApproval: (paymentId) => {
+      console.log("[PAYMENT] Prêt pour approbation serveur. ID :", paymentId);
+    },
+    onReadyForServerCompletion: (paymentId, txid) => {
+      console.log("[PAYMENT] Paiement complété. TxID :", txid);
+      score += 100;
+      scoreEl.textContent = score;
+      messageEl.textContent = "Paiement validé et bonus ajouté !";
       payBtn.disabled = false;
-    });
+    },
+    onCancel: (paymentId) => {
+      console.warn("[PAYMENT] Paiement annulé :", paymentId);
+      messageEl.textContent = "Paiement annulé.";
+      payBtn.disabled = false;
+    },
+    onError: (err, payment) => {
+      console.error("[PAYMENT] Erreur :", err, payment);
+      messageEl.textContent = "Erreur lors du paiement.";
+      payBtn.disabled = false;
+    }
+  });
 });
