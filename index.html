@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pi Clicker</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Pi Clicker</h1>
   <p>Score : <span id="score">0</span></p>
 
-  <button id="connect-btn">Se connecter</button>
-  <button id="click-btn" disabled>Click!</button>
+  <button id="connect-btn">Se connecter</button><br>
+  <button id="click-btn" disabled>Clicker !</button><br>
   <button id="pay-btn" disabled>Acheter un bonus (0.01 π)</button>
 
-  <div id="log" style="background:#111; color:#0f0; font-family:monospace; padding:10px; margin-top:20px; max-height:200px; overflow-y:auto;">
-    <strong>Console logs :</strong>
+  <div id="logs" style="background:#111; color:#0f0; padding:10px; margin-top:20px; max-height:200px; overflow-y:auto;">
+    <strong>Logs :</strong>
   </div>
 
   <script src="main.js"></script>

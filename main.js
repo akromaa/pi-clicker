@@ -1,83 +1,78 @@
-// === LOG HTML DANS LA PAGE ===
-function log(msg) {
-  const logEl = document.getElementById('log');
-  if (logEl) {
-    const line = document.createElement('div');
-    line.textContent = `[LOG] ${msg}`;
-    logEl.appendChild(line);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-  console.log(msg);
+require('dotenv').config();
+const express = require('express');
+const fetch = require('node-fetch'); // npm install node-fetch@2
+const app = express();
+
+app.use(express.json());
+
+const PI_API_KEY = process.env.PI_API_KEY;
+
+if (!PI_API_KEY) {
+  console.error("⚠️  API key missing! Set PI_API_KEY in your .env file.");
+  process.exit(1);
 }
 
-log("Chargement du script main.js...");
+const PI_API_BASE = 'https://api.minepi.com/v2';
 
-const isSandbox = true;
-let score = 0;
+app.post('/payments/approve', async (req, res) => {
+  const { paymentId } = req.body;
+  if (!paymentId) return res.status(400).json({ error: 'Missing paymentId' });
 
-const scoreEl = document.getElementById('score');
-const clickBtn = document.getElementById('click-btn');
-const payBtn = document.getElementById('pay-btn');
-const connectBtn = document.getElementById('connect-btn');
+  try {
+    const response = await fetch(`${PI_API_BASE}/payments/approve`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${PI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ paymentId })
+    });
 
-// === Initialisation du SDK ===
-window.addEventListener('load', () => {
-  if (typeof Pi === "undefined") {
-    log("Erreur : SDK Pi non chargé.");
-    return;
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Error approving payment:', text);
+      return res.status(response.status).json({ error: text });
+    }
+
+    const data = await response.json();
+    console.log('Payment approved:', data);
+    res.json(data);
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  Pi.init({ version: "2.0", sandbox: isSandbox });
-  log(`Pi SDK initialisé (sandbox ${isSandbox ? "activé" : "désactivé"})`);
-
-  setupUI();
 });
 
-// === Fonction de configuration de l'UI ===
-function setupUI() {
-  clickBtn.addEventListener('click', () => {
-    score++;
-    scoreEl.textContent = score;
-    log(`Clique ! Nouveau score : ${score}`);
-  });
+app.post('/payments/complete', async (req, res) => {
+  const { paymentId, txid } = req.body;
+  if (!paymentId || !txid) return res.status(400).json({ error: 'Missing paymentId or txid' });
 
-  connectBtn.addEventListener('click', () => {
-    log("Connexion en cours...");
-    Pi.authenticate(['payments'])
-      .then(auth => {
-        log(`Authentification réussie pour ${auth.user?.username || "utilisateur inconnu"}`);
-        clickBtn.disabled = false;
-        payBtn.disabled = false;
-        connectBtn.disabled = true;
-      })
-      .catch(err => {
-        log("Erreur d'authentification : " + err.message);
-      });
-  });
-
-  payBtn.addEventListener('click', () => {
-    log("Début du paiement...");
-
-    Pi.createPayment({
-      amount: 0.01,
-      memo: "Achat bonus Pi Clicker",
-      metadata: { bonus: true }
-    }, {
-      onReadyForServerApproval: (paymentId) => {
-        log("Prêt pour approbation serveur. Payment ID : " + paymentId);
+  try {
+    const response = await fetch(`${PI_API_BASE}/payments/complete`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${PI_API_KEY}`,
+        'Content-Type': 'application/json'
       },
-      onReadyForServerCompletion: (paymentId, txid) => {
-        log(`Paiement approuvé ! Transaction ID : ${txid}`);
-        score += 100;
-        scoreEl.textContent = score;
-        log(`+100 bonus. Score actuel : ${score}`);
-      },
-      onCancel: (paymentId) => {
-        log("Paiement annulé. ID : " + paymentId);
-      },
-      onError: (err, payment) => {
-        log("Erreur de paiement : " + err.message);
-      }
+      body: JSON.stringify({ paymentId, txid })
     });
-  });
-}
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Error completing payment:', text);
+      return res.status(response.status).json({ error: text });
+    }
+
+    const data = await response.json();
+    console.log('Payment completed:', data);
+    res.json(data);
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

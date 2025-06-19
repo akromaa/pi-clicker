@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Backend</title>
+</head>
+<body>
+  <button id="payButton">Valider paiement</button>
+  <pre id="response"></pre>
+
+  <script>
+    document.getElementById('payButton').addEventListener('click', () => {
+      fetch('http://localhost:3000/payments/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentId: 'test-payment-id',
+          amount: 10
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('response').textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        document.getElementById('response').textContent = 'Erreur: ' + err.message;
+      });
+    });
+  </script>
+</body>
+</html>
