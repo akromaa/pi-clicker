@@ -70,3 +70,14 @@ function setupUI() {
         log(`Paiement approuvé ! Transaction ID : ${txid}`);
         score += 100;
         scoreEl.textContent = score;
+        log(`+100 bonus. Score actuel : ${score}`);
+      },
+      onCancel: (paymentId) => {
+        log("Paiement annulé. ID : " + paymentId);
+      },
+      onError: (err, payment) => {
+        log("Erreur de paiement : " + err.message);
+      }
+    });
+  });
+}
