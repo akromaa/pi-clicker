@@ -1,24 +1,33 @@
 document.getElementById('piForm').addEventListener('submit', async (e) => {
-  e.preventDefault(); // Empêche le reload
-
+  e.preventDefault();
   const recipient = document.getElementById('recipient').value;
   const amount = parseFloat(document.getElementById('amount').value);
 
-  try {
-    const res = await fetch('/send-pi', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipient, amount })
-    });
+  Pi.init({ version: "2.0" });
 
-    const data = await res.json();
-    document.getElementById('result').innerText = `✅ Transaction ID : ${data.txnId || 'N/A'} - ${data.message}`;
+  console.log(`Début transaction : recipient=${recipient}, amount=${amount}`);
 
-    // Vide les champs si succès
-    if (res.ok) {
-      document.getElementById('piForm').reset();
+  Pi.createPayment({
+    amount,
+    memo: "Test Pi sandbox",
+    metadata: { recipient },
+  }, async (payment) => {
+    console.log(`Payment object :`, payment);
+    try {
+      const res = await fetch('/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier })
+      });
+      const data = await res.json();
+      document.getElementById('result').innerText = `✅ ${data.message}`;
+      console.log(`Réponse serveur :`, data);
+    } catch (err) {
+      document.getElementById('result').innerText = '❌ Erreur serveur';
+      console.error('Erreur fetch :', err);
     }
-  } catch (err) {
-    document.getElementById('result').innerText = '❌ Erreur lors de la transaction';
-  }
+  }, (err) => {
+    document.getElementById('result').innerText = `❌ Paiement annulé ou erreur: ${err}`;
+    console.error('Erreur Pi.createPayment :', err);
+  });
 });

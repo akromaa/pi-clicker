@@ -3,23 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Pi Network Sandbox</title>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
-  <h1>Test Pi Network Sandbox</h1>
+  <h1>Pi Sandbox Transaction Test</h1>
   <form id="piForm">
-    <label>Recipient:
+    <label>Recipient (Pi username):
       <input type="text" id="recipient" required>
-    </label>
-    <br>
+    </label><br>
     <label>Amount:
       <input type="number" id="amount" step="0.01" required>
-    </label>
-    <br>
-    <button type="submit">Envoyer une transaction Pi</button>
+    </label><br>
+    <button type="submit">Envoyer Pi</button>
   </form>
-
   <div id="result"></div>
-
   <script src="app.js"></script>
 </body>
 </html>
