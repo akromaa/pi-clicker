@@ -11,11 +11,17 @@ const PI_API_KEY = process.env.PI_API_KEY;
 app.use(express.static(__dirname));
 app.use(express.json());
 
-const logToFile = (msg) => {
+const logToFile = (msg, file = 'server.log') => {
   const logMsg = `[${new Date().toISOString()}] ${msg}\n`;
-  fs.appendFileSync('server.log', logMsg);
+  fs.appendFileSync(file, logMsg);
   console.log(msg);
 };
+
+app.post('/client-log', (req, res) => {
+  const { log } = req.body;
+  logToFile(log, 'client.log');
+  res.sendStatus(200);
+});
 
 app.post('/verify-payment', async (req, res) => {
   const { paymentId } = req.body;
