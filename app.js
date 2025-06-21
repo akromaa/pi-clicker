@@ -1,16 +1,9 @@
-document.getElementById('transaction-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const recipient = document.getElementById('recipient').value;
-  const amount = document.getElementById('amount').value;
-  
+document.getElementById('sendPiBtn').addEventListener('click', async () => {
   try {
-    const res = await fetch('/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipient, amount })
-    });
+    const res = await fetch('/send-pi', { method: 'POST' });
     const data = await res.json();
-    document.getElementById('result').innerText = JSON.stringify(data);
+    alert(`Transaction ID : ${data.txnId || 'Échec'} - ${data.message || ''}`);
   } catch (err) {
-    document.getElementById('result').innerText = 'Error: ' + err.message;
+    alert('Erreur lors de la transaction');
   }
+});
