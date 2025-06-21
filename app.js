@@ -1,9 +1,24 @@
-document.getElementById('sendPiBtn').addEventListener('click', async () => {
+document.getElementById('piForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); // Empêche le reload
+
+  const recipient = document.getElementById('recipient').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+
   try {
-    const res = await fetch('/send-pi', { method: 'POST' });
+    const res = await fetch('/send-pi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipient, amount })
+    });
+
     const data = await res.json();
-    alert(`Transaction ID : ${data.txnId || 'Échec'} - ${data.message || ''}`);
+    document.getElementById('result').innerText = `✅ Transaction ID : ${data.txnId || 'N/A'} - ${data.message}`;
+
+    // Vide les champs si succès
+    if (res.ok) {
+      document.getElementById('piForm').reset();
+    }
   } catch (err) {
-    alert('Erreur lors de la transaction');
+    document.getElementById('result').innerText = '❌ Erreur lors de la transaction';
   }
 });

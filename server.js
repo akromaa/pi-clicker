@@ -1,29 +1,37 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
-const bodyParser = require('body-parser');
-require('dotenv').config();
 
 const app = express();
-app.use(express.static('.'));
-app.use(bodyParser.json());
+const PORT = process.env.PORT || 3000;
 
-app.post('/send', async (req, res) => {
+app.use(express.static(__dirname));
+app.use(express.json());
+
+app.post('/send-pi', async (req, res) => {
   const { recipient, amount } = req.body;
   try {
-    const piRes = await axios.post('https://sandbox.pi.network/transactions', {
-      recipient,
-      amount
+    const response = await axios.post('https://sandbox.pi.network/transaction', {
+      amount,
+      to_address: recipient
     }, {
       headers: {
-        'Authorization': `Bearer ${process.env.PI_SANDBOX_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${process.env.PI_API_KEY}`
       }
     });
-    res.json(piRes.data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    res.json({
+      txnId: response.data.id,
+      message: 'Transaction réussie'
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Erreur API Pi Network',
+      error: error.message
+    });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+});

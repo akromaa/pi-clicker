@@ -1,22 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pi Network Sandbox Transaction</title>
+  <title>Pi Network Sandbox</title>
 </head>
 <body>
-  <h1>Pi Network Sandbox Transaction</h1>
-  <form id="transaction-form">
-    <label for="recipient">Recipient:</label>
-    <input type="text" id="recipient" name="recipient" required>
+  <h1>Test Pi Network Sandbox</h1>
+  <form id="piForm">
+    <label>Recipient:
+      <input type="text" id="recipient" required>
+    </label>
     <br>
-    <label for="amount">Amount:</label>
-    <input type="number" id="amount" name="amount" required>
+    <label>Amount:
+      <input type="number" id="amount" step="0.01" required>
+    </label>
     <br>
-    <button type="submit">Send</button>
+    <button type="submit">Envoyer une transaction Pi</button>
   </form>
-  <p id="result"></p>
+
+  <div id="result"></div>
+
   <script src="app.js"></script>
 </body>
 </html>
