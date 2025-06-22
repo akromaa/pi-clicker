@@ -1,43 +1,14 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Pi App Example</title>
-  </head>
-  <body>
-    <h1>Welcome to my Pi App</h1>
-    <button id="sign-in-button">Sign in with Pi</button>
-    <div id="user-info"></div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pi Network Sandbox Test</title>
+</head>
+<body>
+  <h1>Pi Network Sandbox Test</h1>
+  <button id="btnLogin">Sign in with Pi</button>
 
-    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>
-      const signInButton = document.getElementById('sign-in-button');
-      const userInfoDiv = document.getElementById('user-info');
-
-      signInButton.addEventListener('click', () => {
-        Pi.authenticate(['username'], onIncompletePaymentFound).then(function(auth) {
-          console.log(auth);
-          userInfoDiv.innerText = `Hello ${auth.user.username}`;
-          // Send auth.token to your server to create payment
-          fetch('/create_payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: auth.user.username,
-              accessToken: auth.accessToken
-            })
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Payment created', data);
-          });
-        }).catch(function(error) {
-          console.error(error);
-        });
-      });
-
-      function onIncompletePaymentFound(payment) {
-        console.log("Incomplete payment found", payment);
-      }
-    </script>
-  </body>
+  <script src="main.js"></script>
+</body>
 </html>
